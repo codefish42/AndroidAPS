@@ -39,8 +39,8 @@ public class APSResult {
     @Inject public AAPSLogger aapsLogger;
     @Inject ConstraintChecker constraintChecker;
     @Inject SP sp;
-    @Inject ActivePluginProvider activePlugin;
-    @Inject TreatmentsInterface treatmentsPlugin;
+    @Inject public ActivePluginProvider activePlugin;
+    @Inject public TreatmentsInterface treatmentsPlugin;
     @Inject ProfileFunction profileFunction;
     @Inject ResourceHelper resourceHelper;
 
