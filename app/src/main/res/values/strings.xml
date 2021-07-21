@@ -1390,5 +1390,8 @@
     <string name="keto_protect_strategy_summary">If activated the small safety TBR kicks in when IOB is in negative range as if no basal insulin has been delivered for one hour.\nIf deactivated every Zero Temp is replaced with the small TBR.</string>
     <string name="keto_protect_basal_title">Quantity of the safety TBR [%]</string>
     <string name="keto_protect_basal_summary">Quantity of the small safety TBR in % which is given to avoid ketoacidosis.</string>
+    <string name="keto_protect_min" translatable="false">keto_protect_min</string>
+    <string name="keto_protect_min_title">Minimum absolute basal rate [units]</string>
+    <string name="keto_protect_min_summary">For Dana RS basal rate lower than 0.10 gets set to 0.</string>
 
 </resources>

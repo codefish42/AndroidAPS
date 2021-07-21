@@ -42,14 +42,14 @@ public class DetermineBasalResultSMB extends APSResult {
 
             if (result.has("carbsReq")) carbsReq = result.getInt("carbsReq");
             if (result.has("carbsReqWithin")) carbsReqWithin = result.getInt("carbsReqWithin");
-            
+
 
             if (result.has("rate") && result.has("duration")) {
                 tempBasalRequested = true;
                 rate = result.getDouble("rate");
                 if (rate < 0d) rate = 0d;
 
-                // Ketocidosis Protection
+                // Ketoacidosis Protection
                 // Calculate IOB
                 treatmentsPlugin.updateTotalIOBTreatments();
                 treatmentsPlugin.updateTotalIOBTempBasals();
@@ -58,14 +58,16 @@ public class DetermineBasalResultSMB extends APSResult {
                 // Get active BaseBasalRate
                 double baseBasalRate = activePlugin.getActivePump().getBaseBasalRate();
                 // Activate a small TBR
-                if ( sp.getBoolean(R.string.key_keto_protect, false) && sp.getBoolean(R.string.key_variable_keto_protect_strategy, true) && (bolusIob.iob + basalIob.basaliob) < (0 - baseBasalRate) && -(bolusIob.activity + basalIob.activity) > 0) {
-                    // Variable strategy
-                    double cutoff = baseBasalRate * (sp.getDouble(R.string.keto_protect_basal, 20d) * 0.01);
-                    if (rate < cutoff) rate = cutoff;
-                } else if ( sp.getBoolean(R.string.key_keto_protect, false) && !sp.getBoolean(R.string.key_variable_keto_protect_strategy, true) ) {
-                    // Continuous strategy
-                    double cutoff = baseBasalRate * ( sp.getDouble(R.string.keto_protect_basal, 20d) * 0.01 );
-                    if (rate < cutoff) rate = cutoff;
+                if (sp.getBoolean(R.string.key_keto_protect, false)) {
+                    if (!sp.getBoolean(R.string.key_variable_keto_protect_strategy, true) ||
+                            ((bolusIob.iob + basalIob.basaliob) < (0 - baseBasalRate) && -(bolusIob.activity + basalIob.activity) > 0)) {
+                        double cutoff = baseBasalRate * (sp.getDouble(R.string.keto_protect_basal, 20d) * 0.01);
+                        double min = sp.getDouble(R.string.keto_protect_min, 0.1);
+                        if (cutoff < min)
+                            cutoff = min;
+                        if (rate < cutoff)
+                            rate = cutoff;
+                    }
                 }
                 // End Ketoacidosis Protection
 
