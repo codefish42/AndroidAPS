@@ -7,15 +7,19 @@ import javax.inject.Inject;
 
 import dagger.android.HasAndroidInjector;
 import info.nightscout.androidaps.data.IobTotal;
+import info.nightscout.androidaps.db.BgReading;
 import info.nightscout.androidaps.logging.LTag;
 import info.nightscout.androidaps.R;
 import info.nightscout.androidaps.plugins.aps.loop.APSResult;
 import info.nightscout.androidaps.plugins.treatments.TreatmentsPlugin;
+import info.nightscout.androidaps.plugins.iob.iobCobCalculator.IobCobCalculatorPlugin;
+import info.nightscout.androidaps.plugins.iob.iobCobCalculator.GlucoseStatus;
 import info.nightscout.androidaps.utils.DateUtil;
 import info.nightscout.androidaps.utils.sharedPreferences.SP;
 
 public class DetermineBasalResultSMB extends APSResult {
     @Inject SP sp;
+    @Inject IobCobCalculatorPlugin iobCobCalculatorPlugin;
 
     private double eventualBG;
     private double snoozeBG;
@@ -57,10 +61,17 @@ public class DetermineBasalResultSMB extends APSResult {
                 final IobTotal basalIob = treatmentsPlugin.getLastCalculationTempBasals();
                 // Get active BaseBasalRate
                 double baseBasalRate = activePlugin.getActivePump().getBaseBasalRate();
+
+                GlucoseStatus bgStatus = new GlucoseStatus(injector).getGlucoseStatusData();
+                boolean isLow = (bgStatus != null) &&
+                        ((bgStatus.glucose < 120) && (bgStatus.delta < 0)) || ((bgStatus.glucose < 200) && (bgStatus.delta < -10));
+
                 // Activate a small TBR
                 if (sp.getBoolean(R.string.key_keto_protect, false)) {
                     if (!sp.getBoolean(R.string.key_variable_keto_protect_strategy, true) ||
-                            ((bolusIob.iob + basalIob.basaliob) < (0 - baseBasalRate) && -(bolusIob.activity + basalIob.activity) > 0)) {
+                            (!isLow)
+                        //((bolusIob.iob + basalIob.basaliob) < (0 - baseBasalRate) && -(bolusIob.activity + basalIob.activity) > 0)
+                    ) {
                         double cutoff = baseBasalRate * (sp.getDouble(R.string.keto_protect_basal, 20d) * 0.01);
                         double min = sp.getDouble(R.string.keto_protect_min, 0.1);
                         if (cutoff < min)
