@@ -14,7 +14,7 @@ import javax.inject.Inject
 class DetermineBasalResultSMB private constructor(injector: HasAndroidInjector) : APSResult(injector) {
 
     @Inject
-    var glucoseStatusProvider: GlucoseStatusProvider? = null
+    public var glucoseStatusProvider: GlucoseStatusProvider? = null
 
     private var eventualBG = 0.0
     private var snoozeBG = 0.0
