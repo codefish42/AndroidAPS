@@ -38,7 +38,7 @@ class VersionCheckerPlugin @Inject constructor(
 ), Constraints {
 
     enum class GracePeriod(val warning: Long, val old: Long, val veryOld: Long) {
-        RELEASE(30, 60, 90),
+        RELEASE(300, 600, 900),
         RC(1, 7, 14)
     }
 
