@@ -515,7 +515,7 @@ class OverviewFragment : DaggerFragment(), View.OnClickListener, OnLongClickList
 
         // QuickWizard button
         val quickWizardEntry = quickWizard.getActive()
-        if (quickWizardEntry != null && lastBG != null && profile != null && pump.isInitialized() && !pump.isSuspended() && !loop.isDisconnected) {
+        if (quickWizardEntry != null && lastBG != null && profile != null && pump.isInitialized() && !pump.isSuspended() /*&& !loop.isDisconnected*/) {
             binding.buttonsLayout.quickWizardButton.visibility = View.VISIBLE
             val wizard = quickWizardEntry.doCalc(profile, profileName, lastBG, false)
             binding.buttonsLayout.quickWizardButton.text = quickWizardEntry.buttonText() + "\n" + rh.gs(R.string.format_carbs, quickWizardEntry.carbs()) +
@@ -543,11 +543,11 @@ class OverviewFragment : DaggerFragment(), View.OnClickListener, OnLongClickList
         binding.buttonsLayout.carbsButton.visibility =
             ((!activePlugin.activePump.pumpDescription.storesCarbInfo || pump.isInitialized() && !pump.isSuspended()) && profile != null
                 && sp.getBoolean(R.string.key_show_carbs_button, true)).toVisibility()
-        binding.buttonsLayout.treatmentButton.visibility = (!loop.isDisconnected && pump.isInitialized() && !pump.isSuspended() && profile != null
+        binding.buttonsLayout.treatmentButton.visibility = (/*!loop.isDisconnected &&*/ pump.isInitialized() && !pump.isSuspended() && profile != null
             && sp.getBoolean(R.string.key_show_treatment_button, false)).toVisibility()
-        binding.buttonsLayout.wizardButton.visibility = (!loop.isDisconnected && pump.isInitialized() && !pump.isSuspended() && profile != null
+        binding.buttonsLayout.wizardButton.visibility = (/*!loop.isDisconnected &&*/ pump.isInitialized() && !pump.isSuspended() && profile != null
             && sp.getBoolean(R.string.key_show_wizard_button, true)).toVisibility()
-        binding.buttonsLayout.insulinButton.visibility = (!loop.isDisconnected && pump.isInitialized() && !pump.isSuspended() && profile != null
+        binding.buttonsLayout.insulinButton.visibility = (/*!loop.isDisconnected &&*/ pump.isInitialized() && !pump.isSuspended() && profile != null
             && sp.getBoolean(R.string.key_show_insulin_button, true)).toVisibility()
 
         // **** Calibration & CGM buttons ****
