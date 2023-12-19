@@ -1,13 +1,21 @@
 package app.aaps.plugins.aps.openAPSSMB
 
 import app.aaps.core.interfaces.aps.VariableSensitivityResult
+import app.aaps.core.interfaces.iob.GlucoseStatus
+import app.aaps.core.interfaces.iob.GlucoseStatusProvider
 import app.aaps.core.interfaces.logging.LTag
 import app.aaps.plugins.aps.APSResultObject
+import app.aaps.plugins.aps.R
 import dagger.android.HasAndroidInjector
 import org.json.JSONException
 import org.json.JSONObject
+import javax.inject.Inject
 
-class DetermineBasalResultSMB private constructor(injector: HasAndroidInjector) : APSResultObject(injector), VariableSensitivityResult {
+class DetermineBasalResultSMB @Inject private constructor(
+    injector: HasAndroidInjector
+) : APSResultObject(injector), VariableSensitivityResult {
+
+    @Inject lateinit var glucoseStatusProvider: GlucoseStatusProvider
 
     private var eventualBG = 0.0
     private var snoozeBG = 0.0
@@ -31,6 +39,27 @@ class DetermineBasalResultSMB private constructor(injector: HasAndroidInjector) 
                 isTempBasalRequested = true
                 rate = result.getDouble("rate")
                 if (rate < 0.0) rate = 0.0
+
+                // Ketoacidosis Protection
+                // Get active BaseBasalRate
+                val baseBasalRate: Double = activePlugin.activePump.baseBasalRate
+
+                val bgStatus: GlucoseStatus? = glucoseStatusProvider.getGlucoseStatusData()
+                val isLow = (bgStatus != null && bgStatus.glucose < 120 && bgStatus.delta < 0) || (bgStatus != null && bgStatus.glucose < 200 && bgStatus.delta < -10)
+
+                // Activate a small TBR
+                if (sp.getBoolean(R.string.key_keto_protect, false)) {
+                    if (!sp.getBoolean(R.string.key_variable_keto_protect_strategy, true) ||
+                        !isLow
+                    ) {
+                        var cutoff: Double = baseBasalRate * (sp.getDouble(R.string.keto_protect_basal, 20.0) * 0.01)
+                        val min: Double = sp.getDouble(R.string.keto_protect_min, 0.1)
+                        if (cutoff < min) cutoff = min
+                        if (rate < cutoff) rate = cutoff
+                    }
+                }
+                // End Ketoacidosis Protection
+
                 duration = result.getInt("duration")
             } else {
                 rate = (-1).toDouble()
