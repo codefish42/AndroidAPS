@@ -11,7 +11,7 @@ import org.json.JSONException
 import org.json.JSONObject
 import javax.inject.Inject
 
-class DetermineBasalResultSMB @Inject private constructor(
+class DetermineBasalResultSMB private constructor(
     injector: HasAndroidInjector
 ) : APSResultObject(injector), VariableSensitivityResult {
 
