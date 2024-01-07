@@ -5,7 +5,6 @@ import app.aaps.core.interfaces.iob.GlucoseStatus
 import app.aaps.core.interfaces.iob.GlucoseStatusProvider
 import app.aaps.core.interfaces.logging.LTag
 import app.aaps.plugins.aps.APSResultObject
-import app.aaps.plugins.aps.R
 import dagger.android.HasAndroidInjector
 import org.json.JSONException
 import org.json.JSONObject
@@ -50,7 +49,7 @@ class DetermineBasalResultSMB private constructor(
                 // Activate a small TBR
                 if (!isLow) {
                     var cutoff: Double = baseBasalRate * 0.2 // min: 20%
-                    val min: Double = 0.1 // absolute minimum for Dana RS
+                    val min = 0.1 // absolute minimum for Dana RS
                     if (cutoff < min) cutoff = min
                     if (rate < cutoff) rate = cutoff
                 }
