@@ -48,15 +48,11 @@ class DetermineBasalResultSMB private constructor(
                 val isLow = (bgStatus != null && bgStatus.glucose < 120 && bgStatus.delta < 0) || (bgStatus != null && bgStatus.glucose < 200 && bgStatus.delta < -10)
 
                 // Activate a small TBR
-                if (sp.getBoolean(R.string.key_keto_protect, false)) {
-                    if (!sp.getBoolean(R.string.key_variable_keto_protect_strategy, true) ||
-                        !isLow
-                    ) {
-                        var cutoff: Double = baseBasalRate * (sp.getDouble(R.string.keto_protect_basal, 20.0) * 0.01)
-                        val min: Double = sp.getDouble(R.string.keto_protect_min, 0.1)
-                        if (cutoff < min) cutoff = min
-                        if (rate < cutoff) rate = cutoff
-                    }
+                if (!isLow) {
+                    var cutoff: Double = baseBasalRate * 0.2 // min: 20%
+                    val min: Double = 0.1 // absolute minimum for Dana RS
+                    if (cutoff < min) cutoff = min
+                    if (rate < cutoff) rate = cutoff
                 }
                 // End Ketoacidosis Protection
 
