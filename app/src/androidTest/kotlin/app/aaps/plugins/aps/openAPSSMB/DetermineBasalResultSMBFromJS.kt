@@ -1,7 +1,6 @@
 package app.aaps.plugins.aps.openAPSSMB
 
-import app.aaps.core.interfaces.aps.VariableSensitivityResult
-import app.aaps.core.interfaces.iob.GlucoseStatus
+import app.aaps.core.interfaces.aps.GlucoseStatus
 import app.aaps.core.interfaces.iob.GlucoseStatusProvider
 import app.aaps.core.interfaces.aps.Predictions
 import app.aaps.core.interfaces.logging.LTag
