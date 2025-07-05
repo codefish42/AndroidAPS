@@ -1,6 +1,6 @@
 package app.aaps.plugins.aps.openAPSSMB
 
-import app.aaps.core.interfaces.aps.GlucoseStatus
+//import app.aaps.core.interfaces.aps.GlucoseStatus
 import app.aaps.core.interfaces.iob.GlucoseStatusProvider
 import app.aaps.core.interfaces.aps.Predictions
 import app.aaps.core.interfaces.logging.LTag
@@ -41,20 +41,20 @@ class DetermineBasalResultSMBFromJS private constructor(injector: HasAndroidInje
                 rate = result.getDouble("rate")
                 if (rate < 0.0) rate = 0.0
 
-                // Ketoacidosis Protection
-                // Get active BaseBasalRate
-                val baseBasalRate: Double = activePlugin.activePump.baseBasalRate
-
-                val bgStatus: GlucoseStatus? = glucoseStatusProvider.getGlucoseStatusData()
-                val isLow = (bgStatus != null && bgStatus.glucose < 120 && bgStatus.delta < 0) || (bgStatus != null && bgStatus.glucose < 200 && bgStatus.delta < -10)
-
-                // Activate a small TBR
-                if (!isLow) {
-                    var cutoff: Double = baseBasalRate * 0.2 // min: 20%
-                    val min = 0.1 // absolute minimum for Dana RS
-                    if (cutoff < min) cutoff = min
-                    if (rate < cutoff) rate = cutoff
-                }
+                // OLD Ketoacidosis Protection
+                // // Get active BaseBasalRate
+                // val baseBasalRate: Double = activePlugin.activePump.baseBasalRate
+                //
+                // val bgStatus: GlucoseStatus? = glucoseStatusProvider.getGlucoseStatusData()
+                // val isLow = (bgStatus != null && bgStatus.glucose < 120 && bgStatus.delta < 0) || (bgStatus != null && bgStatus.glucose < 200 && bgStatus.delta < -10)
+                //
+                // // Activate a small TBR
+                // if (!isLow) {
+                //     var cutoff: Double = baseBasalRate * 0.2 // min: 20%
+                //     val min = 0.1 // absolute minimum for Dana RS
+                //     if (cutoff < min) cutoff = min
+                //     if (rate < cutoff) rate = cutoff
+                // }
                 // End Ketoacidosis Protection
 
                 duration = result.getInt("duration")

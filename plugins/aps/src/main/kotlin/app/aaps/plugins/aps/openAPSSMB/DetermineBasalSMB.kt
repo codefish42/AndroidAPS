@@ -107,6 +107,23 @@ class DetermineBasalSMB @Inject constructor(
         consoleError.add(msg)
     }
 
+    // OK modified START
+    fun ketoProtection(_proposedRate: Double, profile: OapsProfile, rT: RT): Double {
+        val baseBasalRate = profile.current_basal
+        var proposedRate = _proposedRate
+        var cutOff : Double = round_basal(baseBasalRate * 0.2)
+        val min = 0.1 // absolute minimum for Dana RS
+        if (cutOff < min) cutOff = min
+        if ((proposedRate < cutOff) && ((rT.bg == null) || rT.bg!! > 100)) {
+            proposedRate = cutOff
+            rT.reason.append("\nKetoacidosis protection sets temp basal to $proposedRate U/h.")
+            consoleError.add("Ketoacidosis protection sets temp basal to $proposedRate U/h")
+        }
+        return proposedRate
+    }
+
+    // OK modified END
+
     private fun getMaxSafeBasal(profile: OapsProfile): Double =
         min(profile.max_basal, min(profile.max_daily_safety_multiplier * profile.max_daily_basal, profile.current_basal_safety_multiplier * profile.current_basal))
 
@@ -143,7 +160,9 @@ class DetermineBasalSMB @Inject constructor(
             }
         } else {
             rT.duration = duration
-            rT.rate = suggestedRate
+            // OK modified START
+            rT.rate = ketoProtection(suggestedRate, profile, rT)
+            // OK modified END
             return rT
         }
     }
@@ -1116,7 +1135,7 @@ class DetermineBasalSMB @Inject constructor(
 
                 // if no zero temp is required, don't return yet; allow later code to set a high temp
                 if (durationReq > 0) {
-                    rT.rate = smbLowTempReq
+                    rT.rate = ketoProtection(smbLowTempReq, profile, rT)
                     rT.duration = durationReq
                     return rT
                 }
